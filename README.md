@@ -4,19 +4,28 @@ Spring Boot based REST API gateway secured with OAuth2
 ## authserver required configuration
 
 Open *application.properties* and
-- change *acme* to a custom CLIENT_ID
-- change *acmesecret* to a strong secret key with lots of entropy
+- change *client_id* to a custom CLIENT_ID
+- change *clientidsecret* to a strong secret key with lots of entropy
 
 ```
 cd Auth\ Server/src/main/resources/
 open -a Xcode application.properties
 
-security.oauth2.client.clientId: acme
-security.oauth2.client.clientSecret: acmesecret
+security.oauth2.client.clientId: client_id
+security.oauth2.client.clientSecret: clientidsecret
 ...
 ```
 
-This registers a client *acme* with a secret and some authorized grant types including "authorization_code"
+This registers a client *client_id* with a secret and some authorized grant types including "authorization_code"
+Authorized grant types include "client_credentials" and "password" which is the recommended grant types for mobile clients. 
+
+**Note**
+To take advantage of all the features of our authserver we want to be able to create tokens for users. To get a token on behalf of a user of our backend we need to be able to authenticate the user. 
+This is why the "password" grant type is included in the:
+```
+security.oauth2.client.authorized-grant-types:
+```
+The "client_credentials" grant type should be used to test the connection to the token endpoint.
 
 - Optional define a *server.port=9999* if you have full control of the deployment environment.
   - If you do this you can remove the *Procfile* from Auth Server root. It is used when deplying to heroku.
@@ -34,3 +43,21 @@ To start the server locally to make sure it is working correctly:
 ```
 mvn spring-boot:run
 ```
+
+####How to get an Access Token
+You can grab a token as the "client_id" client with this curl
+```
+$ curl client_id:clientidsecret@localhost:9999/auth/oauth/token -d grant_type=client_credentials
+{"access_token":"4b6ff0dd-cebe-4adf-96e7-5af934bbb793","token_type":"bearer","expires_in":43199,"scope":"read write"}
+```
+To grab an access token for a "user" with the "client_id" client try this curl. 
+**Note** Remember that an easy to remember password was set in application.properties ``` security.user.password=password ```
+```
+$ curl client_id:clientidsecret@localhost:9999/auth/oauth/token -d grant_type=password -d username=user -d password=password
+{"access_token":"957208f5-09aa-423c-89bc-0861bec780fa","token_type":"bearer","refresh_token":"8587b43f-1a89-4a05-a9e2-e8226c88fbe5","expires_in":43199,"scope":"read write"}
+```
+This verifies that the "password" grant, where you exchange a username and password for an access token works.
+
+####Spring Boot OAuth2 suggestions for "social" login
+**Note** This template doesn't support "social" login by default but it can be easily added by appending 3rd party configuration(s) to the application.properties file.
+Password grant is appropriate for a native or mobile application, and where you have a local user database to store and validate the credentials. For a web app, or any app with "social" login, you need the "authorization code" grant, and that means you need a browser to handle redirects and render the user interfaces from the external providers.
