@@ -1,6 +1,26 @@
 # secure-backend-with-api-gateway
 Spring Boot based REST API gateway secured with OAuth2 
 
+## authserver
+
+The OAuth2 server is used to issue tokens that are used within the distrubuted microservies if any.
+The microservices are located in the resources folder.
+
+You get outta the box a custom implementation of Spring Security ```UserDetailsService``` 
+located ```src/main/java/com/romaine/backend/AuthUserDetailsService.java```
+
+This custom implementation uses a MongoDB respository as the user database to authenticate againist. 
+
+Because of this a template ```User.java``` class is provided.
+
+**Note** This starter-template has a fully configured mongo configuration done programmatically.
+All you need to do is change the *dbName* and *dbURI* in the application.properties to your own MongoDB server
+```
+authserver.dbName=dbName
+authserver.dbURI=mongodb://dbURI
+```
+**Yes, this means you can create as many custom models and there repository interfaces as you like.**
+
 ## authserver required configuration
 
 Open *application.properties* and
@@ -42,6 +62,14 @@ To start the server locally to make sure it is working correctly:
 
 ```
 mvn spring-boot:run
+```
+
+The ```src/main/java/com/romaine/backend/AuthserverApplication.java``` implements ```CommandLineRunner``` and creates a test user account for you. Check the logs for the details it should look like this:
+
+```
+ INFO 10256 --- [           main] s.b.c.e.t.TomcatEmbeddedServletContainer : Tomcat started on port(s): 9999 (https)
+Created User:
+User [id=56aeb1e276fcf14fed19d985, username=user1, password=password, firstName=John, lastName=Doe, email=John.Doe@email.com, properties={role=user, account-enabled=true, account-not-locked=true, account-created-on=2016-01-31T20:16:18.260, authorites=[ROLE_USER], account-not-expired=true, credentials-not-expired=true}]
 ```
 
 ####How to get an Access Token
