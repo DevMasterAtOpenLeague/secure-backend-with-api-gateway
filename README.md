@@ -100,6 +100,6 @@ The generated keystore file should be placed in
 ```
 If properly configured the below curl should look similar to
 ```
-curl -k https://acme:acmesecret@localhost:9999/auth/oauth/token -d grant_type=password -d username=user1 -d password=password
+curl -k https://client_id:clientsecret@localhost:9999/auth/oauth/token -d grant_type=password -d username=user1 -d password=password
 {"access_token":"5e972db0-8654-4498-be79-3d8c98489fa5","token_type":"bearer","refresh_token":"71425be9-aeb2-428a-b848-78a85c4d2830","expires_in":43199,"scope":"write"}
 ```
