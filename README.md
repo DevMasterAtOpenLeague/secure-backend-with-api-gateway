@@ -61,3 +61,17 @@ This verifies that the "password" grant, where you exchange a username and passw
 ####Spring Boot OAuth2 suggestions for "social" login
 **Note** This template doesn't support "social" login by default but it can be easily added by appending 3rd party configuration(s) to the application.properties file.
 Password grant is appropriate for a native or mobile application, and where you have a local user database to store and validate the credentials. For a web app, or any app with "social" login, you need the "authorization code" grant, and that means you need a browser to handle redirects and render the user interfaces from the external providers.
+
+####How to get an Access Token via HTTPS
+The authserver supports HTTPS when the ```spring.profiles.active=https``` is set. This tells spring boot's embedded web server to use HTTPS (SSL/TLS).
+HTTPS requires a signed certificate and a certificate password which we provide using property values located in ```application-https.properties```.
+You can generate a self-signed certificate using Java's keytool.
+The generated keystore file should be placed in
+```
+*/src/main/resources
+```
+If properly configured the below curl should look similar to
+```
+curl -k https://acme:acmesecret@localhost:9999/auth/oauth/token -d grant_type=password -d username=user1 -d password=password
+{"access_token":"5e972db0-8654-4498-be79-3d8c98489fa5","token_type":"bearer","refresh_token":"71425be9-aeb2-428a-b848-78a85c4d2830","expires_in":43199,"scope":"write"}
+```
